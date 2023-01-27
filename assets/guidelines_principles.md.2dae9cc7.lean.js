@@ -1,0 +1,1 @@
+import{_ as e,c as i,o as s,d as n}from"./app.bb503f7b.js";const v=JSON.parse('{"title":"Principles","description":"","frontmatter":{},"headers":[],"relativePath":"guidelines/principles.md"}'),t={name:"guidelines/principles.md"},a=n("",3),l=[a];function r(o,c,d,p,u,_){return s(),i("div",null,l)}const P=e(t,[["render",r]]);export{v as __pageData,P as default};
