@@ -142,7 +142,7 @@ parameters:
   - description: Git Branch
     displayName: Git Branch
     name: GIT_BRANCH
-    value: main
+    value: deployment
   - description: Git Secret
     displayName: Git Secret
     name: GIT_SECRET
