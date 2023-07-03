@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  app: api-event-guidelines
-  template: api-event-guidelines-template
+  app: tars-api-event-guidelines
+  template: tars-api-event-guidelines-template
 message: TARS Web for RTA Users
 metadata:
   annotations:
@@ -14,7 +14,7 @@ metadata:
     tags: instant-app
   labels:
     samples.operator.openshift.io/managed: "true"
-  name: api-event-guidelines-template
+  name: tars-api-event-guidelines-template
 objects:
   - apiVersion: v1
     kind: Route
@@ -134,7 +134,7 @@ parameters:
   - description: The name of the Application
     displayName: Application Name
     name: APPLICATION_NAME
-    value: api-event-guidelines
+    value: tars-api-event-guidelines
   - description: URL to Git Repository
     displayName: Git URI
     name: GIT_URI
