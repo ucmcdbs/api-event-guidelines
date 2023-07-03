@@ -1,0 +1,153 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: api-event-guidelines
+  template: api-event-guidelines-template
+message: TARS Web for RTA Users
+metadata:
+  annotations:
+    description: |-
+      TARS Web for RTA Users
+    iconClass: icon-go
+    openshift.io/display-name: TARS Web for RTA Users
+    openshift.io/provider-display-name: GBM.
+    tags: instant-app
+  labels:
+    samples.operator.openshift.io/managed: "true"
+  name: api-event-guidelines-template
+objects:
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: app
+      annotations:
+        template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
+    spec:
+      tls:
+        termination: edge
+      to:
+        kind: Service
+        name: ${APPLICATION_NAME}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${APPLICATION_NAME}
+    spec:
+      selector:
+        app: ${APPLICATION_NAME}
+      ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 3001
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ${APPLICATION_NAME}
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      labels:
+        app: ${APPLICATION_NAME}
+      name: ${APPLICATION_NAME}
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: ${APPLICATION_NAME}
+      labels:
+        app: ${APPLICATION_NAME}
+    spec:
+      replicas: ${{REPLICA_COUNT}}
+      selector:
+        matchLabels:
+          app: ${APPLICATION_NAME}
+      template:
+        metadata:
+          labels:
+            app: ${APPLICATION_NAME}
+        spec:
+          containers:
+            - name: ${APPLICATION_NAME}
+              image: image-registry.openshift-image-registry.svc:5000/tars-images/${APPLICATION_NAME}:latest
+              env:
+                - name: API_BASE_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: ${APPLICATION_NAME}
+                      key: api_base_url
+                - name: API_PROXY_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: ${APPLICATION_NAME}
+                      key: api_proxy_url
+                - name: NODE_TLS_REJECT_UNAUTHORIZED
+                  value: "0"
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /
+                  port: 3001
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 10
+              livenessProbe:
+                tcpSocket:
+                  port: 3001
+                initialDelaySeconds: 10
+                periodSeconds: 20
+                failureThreshold: 3
+                successThreshold: 1
+              ports:
+                - containerPort: 3001
+              restartPolicy: Always
+          hostAliases:
+            - ip: 10.11.68.61
+              # - ip: 213.42.54.73
+              hostnames:
+                - iameservices.rtatestdom.local
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      name: ${APPLICATION_NAME}
+    spec:
+      runPolicy: Serial
+      source:
+        git:
+          ref: ${GIT_BRANCH}
+          uri: ${GIT_URI}
+        sourceSecret:
+          name: ${GIT_SECRET}
+        type: Git
+      strategy:
+        type: Docker
+      output:
+        to:
+          kind: ImageStreamTag
+          name: ${APPLICATION_NAME}:latest
+          namespace: tars-images
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      name: ${APPLICATION_NAME}
+      namespace: tars-images
+parameters:
+  - description: The name of the Application
+    displayName: Application Name
+    name: APPLICATION_NAME
+    value: api-event-guidelines
+  - description: URL to Git Repository
+    displayName: Git URI
+    name: GIT_URI
+    value: "ssh://git@github.com/ucmcdbs/api-event-guidelines.git"
+  - description: Git Branch
+    displayName: Git Branch
+    name: GIT_BRANCH
+    value: main
+  - description: Git Secret
+    displayName: Git Secret
+    name: GIT_SECRET
+    value: tars-at-github
+  - description: Number of POD Replicas
+    displayName: Replica Count
+    name: REPLICA_COUNT
+    value: "1"

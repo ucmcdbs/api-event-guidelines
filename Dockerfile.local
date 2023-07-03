@@ -1,0 +1,18 @@
+FROM node:14-buster-slim as builder
+
+WORKDIR /opt/build
+
+COPY ./ ./
+
+RUN yarn install
+RUN yarn generate
+
+FROM caddy:alpine
+
+WORKDIR /opt/app
+
+COPY Caddyfile /etc/caddy
+COPY --from=builder /opt/build/public/ ./apps/api-event-guidelines
+
+# expose ports
+EXPOSE 3001/tcp

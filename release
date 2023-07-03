@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+docker rmi -f tars-web:latest
+docker build -f Dockerfile -t tars-web:latest .
+# docker run -it --env-file .env.local --name tars-web -p 3000:3000 tars-web
+
+docker tag tars-web:latest quay.io/gbmtars/tars-web:latest
+docker push quay.io/gbmtars/tars-web:latest

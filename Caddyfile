@@ -1,0 +1,17 @@
+:3001
+redir / /apps/api-event-guidelines
+root * /opt/app
+try_files {path} /apps/api-event-guidelines/index.html
+header {
+  Cache-Control "public, max-age=15, must-revalidate"
+  Content-Security-Policy "upgrade-insecure-requests"
+  Referrer-Policy "strict-origin-when-cross-origin"
+  X-Content-Type-Options "nosniff"
+  X-Download-Options "noopen"
+  X-Frame-Options "SAMEORIGIN"
+  X-Permitted-Cross-Domain-Policies "none"
+  X-Robots-Tag "none"
+  X-XSS-Protection "1; mode=block"
+}
+header -Server
+file_server

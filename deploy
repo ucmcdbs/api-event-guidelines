@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+oc import-image tars-web --from=quay.io/gbmtars/tars-web --reference-policy='local' --confirm --insecure -n tars-images
+oc rollout restart deployment/tars-web -n tars-web

@@ -1,0 +1,10 @@
+.env
+.env.*
+.git/
+.github/
+.nuxt/
+.scannerwork/
+.vscode/
+node_modules/
+public/
+static/assets/
